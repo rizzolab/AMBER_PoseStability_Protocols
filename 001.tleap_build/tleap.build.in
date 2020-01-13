@@ -1,0 +1,51 @@
+#!/usr/bin/sh
+
+###Load Protein force field
+source leaprc.protein.ff14SB
+###Load GAFF force field (for our ligand)
+source leaprc.gaff
+###Load TIP3P (water) force field
+source leaprc.water.tip3p
+####Load Ions frcmod for the tip3p model
+loadamberparams frcmod.ionsjc_tip3p
+###Needed so we can use igb=8 model
+set default PBradii mbondi3
+
+
+###Load Protein pdb file
+rec=loadpdb ../zzz.master/system.rec.noH.pdb
+
+###Load Ligand frcmod/mol2
+loadamberparams ../000.parameters/system_lig.am1bcc.frcmod
+lig=loadmol2 ../000.parameters/system_lig.am1bcc.mol2
+
+###Create gas-phase complex
+gascomplex= combine {rec lig}
+
+###Write gas-phase pdb
+savepdb gascomplex system.gas.complex.pdb
+
+###Write gas-phase toplogy and coord files for MMGBSA calc
+saveamberparm gascomplex system.gas.complex.prmtop system.gas.complex.rst7
+saveamberparm rec system.gas.receptor.prmtop system.gas.receptor.rst7
+saveamberparm lig system.gas.ligand.prmtop system.gas.ligand.rst7
+
+###Create solvated complex (albeit redundant)
+solvcomplex= combine {rec lig}
+
+###Solvate the system
+solvateoct solvcomplex TIP3PBOX 12.0
+
+###Neutralize system (it will add either Na or Cl depending on net charge)
+addions solvcomplex Cl- 0
+addions solvcomplex Na+ 0
+
+###Write solvated pdb file
+savepdb solvcomplex system.wet.complex.pdb
+
+###Check the system
+charge solvcomplex
+check solvcomplex
+
+###Write Solvated topology and coord file
+saveamberparm solvcomplex system.wet.complex.prmtop system.wet.complex.rst7

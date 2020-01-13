@@ -1,0 +1,13 @@
+# Run the rmsd script 
+
+	bash rmsd.sh 
+
+# Change the files read in in the gnuplot script
+
+# Run the plotting script:
+
+	gnuplot plot_rmsd_vs_time.gp
+
+# This will produce out a .png.
+
+

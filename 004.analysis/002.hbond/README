@@ -1,0 +1,13 @@
+# Run the rmsd script 
+
+	bash hbond.sh 
+
+# Change the files read in in the gnuplot script
+
+# Run the plotting script:
+
+	gnuplot plot_his_rmsd.gp
+
+# This will produce out a .png.
+
+

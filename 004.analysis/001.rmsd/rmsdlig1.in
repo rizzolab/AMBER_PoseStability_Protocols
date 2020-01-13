@@ -1,0 +1,7 @@
+parm ../001.tleap_build/system.gas.complex.prmtop
+
+parmstrip :WAT:Na+:Cl-
+
+trajin stripfit1.trj
+
+rmsd rms1 first ":145&!(@H=)" nofit mass out sim1.dat

@@ -1,0 +1,13 @@
+parm ../../001.tleap_build/system.wet.complex.prmtop
+
+trajin ../../001.tleap_build/system.wet.complex.rst7
+trajin ../../003.production/001.restrained/10.prod3.trj
+
+autoimage
+
+strip :WAT:Na+:Cl-
+
+rmsd rms1 first :1-145@CA
+
+trajout stripfit3.trj nobox
+

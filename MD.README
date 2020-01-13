@@ -1,0 +1,64 @@
+#!/usr/bin/sh
+
+
+#Add or check to make sure that you have the necessary lines in your .bashrc file and 
+#remember to logout and log back in because sometimes source .bashrc does not work effectively
+
+vi ~/.bashrc
+#-------------------------------------------------------------
+module load anaconda/2
+module load cuda75/toolkit/7.5.18
+export CUDA_HOME="/cm/shared/apps/cuda75/toolkit/7.5.18"
+export PATH=$CUDA_HOME/bin:$PATH
+
+export AMBERHOME=/zzz.programs/amber16
+export PATH=$AMBERHOME/bin\:$PATH
+test -f /zzz.programs/amber16/amber.sh && source /zzz.programs/amber16/amber.sh
+
+
+# STEP1
+#-------------------------------------------------------------
+cd 000.parameters
+# Parameterize the ligand
+# the only thing that needs to be changed is the mol2 file's and the number after the -nc flag 
+#-nc stands for net charge 
+antechamber -i ../zzz.master/system.lig.clean.mol2 -fi mol2 -o system_lig.am1bcc.mol2 -fo mol2 -at gaff -c bcc -rn LIG -nc 1
+
+# Check for missing FF parameters
+parmchk2 -i system_lig.am1bcc.mol2 -f mol2 -o system_lig.am1bcc.frcmod
+#-------------------------------------------------------------
+
+#STEP2
+#-------------------------------------------------------------
+cd 001.tleap_build
+# Create Amber toplogy and coordinates files for the MD simulation
+tleap -f tleap.build.in
+# Afterwards check your leap.log for words like FATAL or ERROR thats bad
+# Visualize the topology files before running MD on herbie!!!! :)
+#-------------------------------------------------------------
+
+#STEP3
+#-------------------------------------------------------------
+cd 002.equilibration
+# Equilibrate the biological system: slowly relax them with restraints and varying temperatures
+nohup bash md.equilibration.sh &
+
+# to check your job and that its running on the nvidia gpu cards
+# put the command watch infront if you want a running clock controlC to cancel it
+nvidia-smi
+
+# Submit the production job
+cd 003.production/001.restrained
+nohup bash  prod.sh &
+
+# check job same as above
+#-------------------------------------------------------------
+
+#STEP4
+#actually process the data to make a pretty graph
+# there's a readme file in that directory
+#-------------------------------------------------------------
+#Post-process the trajectory
+cd 004.analysis/001.rmsd
+cd 004.analysis/002.hbond
+#-------------------------------------------------------------

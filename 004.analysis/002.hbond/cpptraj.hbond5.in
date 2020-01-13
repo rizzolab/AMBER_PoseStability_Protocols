@@ -1,0 +1,9 @@
+#!/usr/bin/sh
+#read in parm
+parm ../../001.tleap_build/system.wet.complex.prmtop
+#read in trajectory
+trajin ../../003.production/001.restrained/10.prod5.trj
+#wrap everything into one periodic cell
+autoimage
+#compute intra and water mediated hydrogen bonds
+hbond hb1 :1-145 out system.hbond.out avgout system.5.hbond.avg.dat solventdonor :WAT solventacceptor :WAT nointramol bridgeout system.5.bridge-water.dat dist 3.0 angle 140
